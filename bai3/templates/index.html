@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Quản Lý Sản Phẩm</title>
+    <style>
+        .container { max-width: 1200px; margin-top: 2rem; }
+        .product-form { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 2rem; }
+        .table { box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        .pagination { justify-content: center; margin-top: 2rem; }
+        .btn-action { margin: 0 5px; }
+        .table th { background-color: #0d6efd; color: white; }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-container .btn-secondary {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <form action="{{ url_for('index') }}" method="GET" class="search-form">
+            <input type="text" name="search" value="{{ search_query }}" placeholder="Tìm kiếm sản phẩm...">
+            <button type="submit">Tìm kiếm</button>
+        </form>
+        {% if search_query %}
+            <a href="{{ url_for('index') }}" class="btn btn-secondary mt-2">Trở về trang chủ</a>
+        {% endif %}
+    </div>
+    <div class="container">
+        <h1 class="text-center mb-4">Quản Lý Sản Phẩm</h1>
+        
+        <div class="product-form">
+            <form action="/add" method="POST" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="name" placeholder="Tên sản phẩm" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" class="form-control" name="price" placeholder="Giá" required>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" class="form-control" name="quantity" placeholder="Số lượng" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="description" placeholder="Mô tả">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Mô tả</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product[0] }}</td>
+                        <td>{{ product[1] }}</td>
+                        <td>{{ "{:,.0f}".format(product[2]) }} đ</td>
+                        <td>{{ product[3] }}</td>
+                        <td>{{ product[4] }}</td>
+                        <td>
+                            <a href="/edit/{{ product[0] }}" class="btn btn-warning btn-sm btn-action">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/delete/{{ product[0] }}" class="btn btn-danger btn-sm btn-action" 
+                               onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if trang_hien_tai > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ trang_hien_tai - 1 }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for page in range(1, tong_so_trang + 1) %}
+                <li class="page-item {% if page == trang_hien_tai %}active{% endif %}">
+                    <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                </li>
+                {% endfor %}
+
+                {% if trang_hien_tai < tong_so_trang %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ trang_hien_tai + 1 }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
